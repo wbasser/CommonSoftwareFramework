@@ -1,0 +1,166 @@
+/******************************************************************************
+ * @file ButtonManager_def.h
+ *
+ * @brief key handler declarations
+ *
+ * This file 
+ *
+ * @copyright Copyright (c) 2012 CyberIntegration
+ * This document contains proprietary data and information of CyberIntegration 
+ * LLC. It is the exclusive property of CyberIntegration, LLC and will not be 
+ * disclosed in any form to any party without prior written permission of 
+ * CyberIntegration, LLC. This document may not be reproduced or further used 
+ * without the prior written permission of CyberIntegration, LLC.
+ *
+ * Version History
+ * ======
+ * $Log: $
+ * 
+ *
+ * \addtogroup ButtonManager
+ * @{
+ *****************************************************************************/
+ 
+// ensure only one instantiation
+#ifndef _BUTTONMANAGER_DEF_H
+#define _BUTTONMANAGER_DEF_H
+
+// system includes ------------------------------------------------------------
+#include "Types/Types.h"
+
+// local includes -------------------------------------------------------------
+#include "ButtonManager/ButtonManager_prm.h"
+
+// library includes -----------------------------------------------------------
+#if ( SYSTEMDEFINE_OS_SELECTION == SYSTEMDEFINE_OS_TASKMANAGER )
+  #include "TaskManager/TaskManager.h"
+#endif // ( SYSTEMDEFINE_OS_SELECTION == SYSTEMDEFINE_OS_TASKMANAGER )
+
+// Macros and Defines ---------------------------------------------------------
+/// define the helper macro for filling a keyboard handler configuation
+#define BTNMNGR_CFG_ENTRY( debnc, repdly, reprate, sh_time, mh_time, lh_time, stuck_time ) \
+    .wDebounceTimeMsecs = debnc, \
+    .wRepeatDelayMsecs = repdly, \
+    .wRepeatRateMsecs = reprate, \
+    .wShortHoldTimeMsecs = sh_time, \
+    .wMediumHoldTimeMsecs = mh_time, \
+    .wLongHoldTimeMsecs = lh_time, \
+    .wStuckTimeMsecs = stuck_time \
+
+/// define the helper macro for creating button manager entry events
+#define BTNMNGR_DEFCB_ENTRY( keyenum, rel_enb, prs_enb, rep_enb, shh_enb, mdh_enb, lng_enb, tgl_enb, getstatus, callback ) \
+  {\
+    .eRptMethod = BTNMNGR_RPTMETHOD_CB, \
+    .nKeyEnum = keyenum, \
+    .tEventFlags = \
+    { \
+      .bReleaseEnable = rel_enb, \
+      .bPressEnable = prs_enb, \
+      .bRepeatEnable = rep_enb, \
+      .bShortHoldEnable = shh_enb, \
+      .bMediumHoldEnable = mdh_enb, \
+      .bLongHoldEnable = lng_enb, \
+      .bToggleEnable = tgl_enb, \
+    }, \
+    .pvGetStatus = getstatus, \
+    .pvCallback = callback \
+  }
+
+#if ( SYSTEMDEFINE_OS_SELECTION == SYSTEMDEFINE_OS_TASKMANAGER )
+  #define BTNMNGR_DEFEVENT_ENTRY( keyenum, rel_enb, prs_enb, rep_enb, shh_enb, mdh_enb, lng_enb, tgl_enb, getstatus, task ) \
+    {\
+      .eRptMethod = BTNMNGR_RPTMETHOD_EVENT, \
+      .uKeyEnum = keyenum, \
+      .tEventFlags = \
+      { \
+        .bReleaseEnable = rel_enb, \
+        .bPressEnable = prs_enb, \
+        .bRepeatEnable = rep_enb, \
+        .bShortHoldEnable = shh_enb, \
+        .bMediumHoldEnable = mdh_enb, \
+        .bLongHoldEnable = lng_enb, \
+        .bToggleEnable = tgl_enb, \
+      }, \
+      .pvGetStatus = getstatus, \
+      .eTaskEnum = task \
+    }
+#elif ( SYSTEMDEFINE_OS_SELECTION == SYSTEMDEFINE_OS_TASKSCHEDULER )
+  #define BTNMNGR_DEFEVENT_ENTRY( keyenum, rel_enb, prs_enb, rep_enb, shh_enb, mdh_enb, lng_enb, tgl_enb, getstatus, task ) \
+    {\
+      .eRptMethod = BTNMNGR_RPTMETHOD_EVENT, \
+      .uKeyEnum = keyenum, \
+      .tEventFlags = \
+      { \
+        .bReleaseEnable = rel_enb, \
+        .bPressEnable = prs_enb, \
+        .bRepeatEnable = rep_enb, \
+        .bShortHoldEnable = shh_enb, \
+        .bMediumHoldEnable = mdh_enb, \
+        .bLongHoldEnable = lng_enb, \
+        .bToggleEnable = tgl_enb, \
+      }, \
+      .pvGetStatus = getstatus, \
+      .ptTaskHandle = task \
+    }
+#endif // ( SYSTEMDEFINE_OS_SELECTION == SYSTEMDEFINE_OS_TASKMANAGER )
+
+/// define the shift count/mask
+#define EVENT_SHIFT_CNT         ( 5 )
+#define EVENT_KEY_MASK          ( 0x1F )
+
+// enumerations ---------------------------------------------------------------
+/// enumerate the reporting method
+typedef enum _BTNMNGRRPTMETHOD
+{
+  BTNMNGR_RPTMETHOD_CB = 0,       ///< call back method
+  BTNMNGR_RPTMETHOD_EVENT,        ///< event
+} BTNMNGRRPTMETHOD;
+
+// structures -----------------------------------------------------------------
+/// define the callback function event
+typedef void ( *PVBTNMNGRCBFUNC  )( U8, U8 );
+
+/// define the get button status 
+typedef BOOL ( *PVBTNMNGRGETSTS )( U32 );
+
+/// define the key global settings
+typedef struct _BTNMNGRCFG
+{
+  U16   wDebounceTimeMsecs;       ///< debounce time
+  U16   wRepeatDelayMsecs;        ///< repeat delay
+  U16   wRepeatRateMsecs;         ///< repeat rate
+  U16   wShortHoldTimeMsecs;      ///< short hold time
+  U16   wMediumHoldTimeMsecs;     ///< medium hold time
+  U16   wLongHoldTimeMsecs;       ///< long hold time
+  U16   wStuckTimeMsecs;          ///< stuck key time
+} BTNMNGRCFG, *PBTNMNGRCFG; 
+#define BTNMNGRCFG_SIZE  sizeof( BTNMNGRCFG )
+
+/// define the key definition structure
+typedef struct _BTNMNGRDEF
+{
+  U32               uKeyEnum;     ///< key enumeratoru
+  #if ( SYSTEMDEFINE_OS_SELECTION == SYSTEMDEFINE_OS_TASKMANAGER )
+    TASKSCHDENUMS     eTaskEnum;    ///< task enumerator
+  #elif ( SYSTEMDEFINE_OS_SELECTION == SYSTEMDEFINE_OS_TASKSCHEDULER )
+    PTASKSCHEDULERHANDLE ptTaskHandle;
+  #endif
+  BTNMNGRRPTMETHOD  eRptMethod;   ///< report method
+  struct
+  {
+    BOOL  bReleaseEnable    : 1;  ///< enable release events
+    BOOL  bPressEnable      : 1;  ///< enable press events
+    BOOL  bRepeatEnable     : 1;  ///< enable repeat events
+    BOOL  bShortHoldEnable  : 1;  ///< enable short hold events
+    BOOL  bMediumHoldEnable : 1;  ///< medium hold events
+    BOOL  bLongHoldEnable   : 1;  ///< enable long hold events
+    BOOL  bToggleEnable     : 1;  ///< enable toggle operations
+  } tEventFlags;
+  PVBTNMNGRGETSTS      pvGetStatus;   ///< get status function
+  PVBTNMNGRCBFUNC      pvCallback;    ///< callback function
+} BTNMNGRDEF, *PBTNMNGRDEF;
+#define BTNMNGRDEF_SIZE   sizeof( BTNMNGRDEF )
+
+/**@} EOF ButtonManager_def.h */
+
+#endif  // _BUTTONMANAGER_DEF_H

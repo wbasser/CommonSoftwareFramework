@@ -1,0 +1,83 @@
+<repository path="d:\repository">
+  <micro>
+    <microtype vendor="Microchip" name="SAMD" type="0x00000001" path="HAL/Microchip/SAMD"></microtype>
+  </micro>
+  <Algorithms>
+    <module Name="FilterAveraging"          halchk="N" config="N" path="Filters/FilterAveraging"   ></module>
+    <module Name="FilterLeadLag"            halchk="N" config="N" path="Filters/FilterLeadLag"     ></module>
+    <module Name="GoetzelToneDetect"        halchk="N" config="N" path="GoetzelToneDetect"         ></module>
+    <module Name="HysteresisControlFull"    halchk="N" config="Y" path="HysteresisControlFull"     ></module>
+    <module Name="HysteresisControlSimple"  halchk="N" config="N" path="HysteresisControlFull"     ></module>
+    <module Name="NCOToneGenerator"         halchk="N" config="Y" path="NCOToneGenerator"          ></module>
+    <module Name="PID"                      halchk="N" config="Y" path="PID"                       ></module>
+    <module Name="SteinhartHart"            halchk="N" config="N" path="SteinhartHart"             ></module>
+  </algorithms>
+  <Drivers>
+    <module name="AfeLM9100X"             halchk="N" config="Y" path="AfeLM9100X"         ></module>
+    <module name="CnvDAC8571"             halchk="N" config="Y" path="CnvDAC8571"         ></module>
+    <module name="DacLTC2655"             halchk="N" config="Y" path="DacLTC2655"         ></module>
+    <module name="DdsAD9833"              halchk="N" config="Y" path="DdsAD9833"          ></module>
+    <module name="EEPROMHandler"          halchk="N" config="Y" path="EEPROMHandler"      ></module>
+    <module name="HapDRV2625"             halchk="N" config="Y" path="HapDRV2625"         ></module>
+    <module name="ImuICM20948"            halchk="N" config="Y" path="ImuICM20948"        ></module>
+    <module name="IoePCA9555"             halchk="N" config="Y" path="IoePCA9555"         ></module>
+    <module name="LcdHD44780"             halchk="N" config="Y" path="LcdHD44780"         ></module>
+    <module name="LcdSSD1306"             halchk="N" config="Y" path="LcdSSD1306"         ></module>
+    <module name="LedHT16K33Handler"      halchk="N" config="Y" path="LedHT16K33Handler"  ></module>
+    <module name="LedMAX695XHandler"      halchk="N" config="Y" path="LedMAX695XHandler"  ></module>
+    <module name="LedMAX7219Handler"      halchk="N" config="Y" path="LedMAX7219Handler"  ></module>
+    <module name="ManchesterCodec"        halchk="N" config="Y" path="ManchesterCodec"    ></module>
+    <module name="PotTPL0401X"            halchk="N" config="Y" path="PotTPL0401X"        ></module>
+    <module name="PotTPL0401X"            halchk="N" config="Y" path="PotTPL0401X"        ></module>
+    <module name="SenBME280"              halchk="N" config="Y" path="SenBME280"          ></module>
+    <module name="SenBMP388"              halchk="N" config="Y" path="SenBMP388"          ></module>
+    <module name="SenMPLA115A2"           halchk="N" config="Y" path="SenMPLA115A2"       ></module>
+    <module name="SenSI7210A20"           halchk="N" config="Y" path="SenSI7210A20"       ></module>
+    <module name="UsbGenHandler"          halchk="N" config="Y" path="UsbGenHandler"      ></module>
+    <module name="VSK10XXHandler"         halchk="N" config="Y" path="VSK10XXHandler"     ></module>
+  </Drivers>
+  <HAL>
+    <module name="AC"             halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="AC"             ></module>
+    <module name="ADC"            halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="ADC"            ></module>
+    <module name="Clock"          halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000001" path="Clock"          ></module>
+    <module name="DAC"            halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="DAC"            ></module>
+    <module name="DSU"            halchk="Y" config="N" procmask="0x00000001" mandmask="0x00000000" path="DSU"            ></module>
+    <module name="Event"          halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="Event"          ></module>
+    <module name="GPIO"           halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="GPIO"           ></module>
+    <module name="I2C"            halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="I2C"            ></module>
+    <module name="Interrupt"      halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000001" path="Interrupt"      ></module>
+    <module name="MemoryMaps"     halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="MemoryMaps"     ></module>
+    <module name="PowerManager"   halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000001" path="PowerManager"   ></module>
+    <module name="RTC"            halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="RTC"            ></module>
+    <module name="SerialNumber"   halchk="Y" config="N" procmask="0x00000001" mandmask="0x00000001" path="SerialNumber"   ></module>
+    <module name="SleepManager"   halchk="Y" config="N" procmask="0x00000001" mandmask="0x00000000" path="SleepManager"   ></module>
+    <module name="SPI"            halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="SPI"            ></module>
+    <module name="SystemTick"     halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000001" path="SystemTick"     ></module>
+    <module name="Timers"         halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="Timers"         ></module>
+    <module name="UART"           halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="UART"           ></module>
+    <module name="UART-SIMPLE"    halchk="Y" config="N" procmask="0x00000001" mandmask="0x00000000" path="UART-Simple"    ></module>
+    <module name="USB"            halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="USB"            ></module>
+    <module name="USBCDCHandler"  halchk="Y" config="Y" procmask="0x00000001" mandmask="0x00000000" path="USBCDCHandler"  ></module>
+  </HAL>
+  <OS>
+    <module name="QueueManager"         halchk="N" config="Y" path="QueueManager"         ></module>
+    <module name="SystemControlManager" halchk="N" config="Y" path="SystemControlManager" ></module>
+    <module name="TaskManager"          halchk="N" config="Y" path="TaskManager"          ></module>
+  </OS>
+  <Services>
+    <module name="AscBinDirector" config="0xFFFFFFFF" mandmask="0x00000000" path="CommandHandlers/AscBinDirector"></module>
+    <module name="AsciiCommandHandler" config="0xFFFFFFFF" mandmask="0x00000000" path="CommandHandlers/ASCII"></module>
+    <module name="BinaryCommandHandler" config="0xFFFFFFFF" mandmask="0x00000000" path="CommandHandlers/Binary"></module>
+    <module name="ConfigManager" config="0xFFFFFFFF" mandmask="0x00000000" path="ConfigManager"></module>
+    <module name="DebugManager" config="0xFFFFFFFF" mandmask="0x00000000" path="DebugManager"></module>
+    <module name="InputOutManager" config="0xFFFFFFFF" mandmask="0x00000000" path="InputOutputManager"></module>
+    <module name="LedManager" config="0xFFFFFFFF" mandmask="0x00000000" path="LedManager"></module>
+    <module name="LogManager" config="0xFFFFFFFF" mandmask="0x00000000" path="LogManager"></module>
+    <module name="ManufInfo" config="0xFFFFFFFF" mandmask="0x00000000" path="ManufInfo"></module>
+    <module name="SensorManager" config="0xFFFFFFFF" mandmask="0x00000000" path="SensorManager"></module>
+  </Services>
+  <TPAL>
+  </TPAL>
+  <TPL>
+  </TPL>
+</repository>
