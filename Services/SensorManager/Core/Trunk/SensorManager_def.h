@@ -52,6 +52,7 @@
     .xMaxEguValue = maxegu, \
     .eFiltType = SENMAN_FILTTYPE_NONE, \
     .pvLinearize = NULL, \
+    .pvCompensate = NULL, \
     .pvExtCallback = NULL, \
 }
   
@@ -67,6 +68,7 @@
     .xMaxEguValue = maxegu, \
     .eFiltType = SENMAN_FILTTYPE_NONE, \
     .pvLinearize = linfunc, \
+    .pvCompensate = NULL, \
     .pvExtCallback = NULL, \
     .nLinOption = linopt, \
   }
@@ -89,6 +91,7 @@
         .pxBuffer = ( PU16 )&ax ## bufname ## AvgFilt, \
       }, \
       .pvLinearize = NULL, \
+      .pvCompensate = NULL, \
       .pvExtCallback = NULL, \
     }
   
@@ -109,6 +112,7 @@
         .pxBuffer = ( PU16 )&ax ## bufname ## AvgFilt, \
       }, \
       .pvLinearize = linfunc, \
+      .pvCompensate = NULL, \
       .pvExtCallback = NULL, \
       .nLinOption = linopt, \
     }
@@ -132,6 +136,7 @@
         .fLeadTc = leadtc, \
       } \
       .pvLinearize = NULL, \
+      .pvCompensate = NULL, \
       .pvExtCallback = NULL, \
   }
 
@@ -152,6 +157,7 @@
         .fLeadTc = leadtc, \
       }, \
       .pvLinearize = linfunc, \
+      .pvCompensate = NULL, \
       .pvExtCallback = NULL, \
       .nLinOption = linopt, \
     }
@@ -171,6 +177,7 @@
     .tGetFuncs.pvExt = getfunc, \
     .pvExtCallback = cbfunc, \
     .pvLinearize = NULL, \
+    .pvCompensate = NULL, \
   }
   
 /// define the helper macro for defining an external channel no filter with linearization
@@ -186,6 +193,7 @@
     .eFiltType = SENMAN_FILTTYPE_NONE, \
     .tGetFuncs.pvExt = getfunc, \
     .pvLinearize = linfunc, \
+    .pvCompensate = NULL, \
     .pvExtCallback = cbfunc, \
     .nLinOption = linopt, \
   }
@@ -209,6 +217,7 @@
        }, \
       .tGetFuncs.pvExt = getfunc, \
       .pvLinearize = NULL, \
+      .pvCompensate = NULL, \
       .pvExtCallback = cbfunc, \
     }
 
@@ -231,6 +240,7 @@
       .tGetFuncs.pvExt = getfunc, \
       .pvLinearize = linfunc, \
       .pvExtCallback = cbfunc, \
+      .pvCompensate = NULL, \
       .nLinOption = linopt, \
     }
 #endif // SENSORMANAGER_AVERAGE_FILTER_ENABLE
@@ -255,6 +265,7 @@
       .tGetFuncs.pvExt = getfunc,
       .pvExtCallback = cbfunc, \
       .pvLinearize = NULL, \
+      .pvCompensate = NULL, \
     }
 
   /// define the helper macro for defining a external channel with lead lag filter and linearization
@@ -276,9 +287,27 @@
       .tGetFuncs.pvExt = getfunc,
       .pvExtCallback = cbfunc, \
       .pvLinearize = linfunc, \
+      .pvCompensate = NULL, \
       .nLinOption = linopt, \
     }
 #endif // SENSORMANAGER_LEADLAG_FILTER_ENABLE
+  
+/// define the helper macro for defining an external channel no filter, compensated
+#define SENMANEXTCMPNOFILT( chan, samprate, getfunc, cmpfunc ) \
+  { \
+    .eInpType = SENMAN_INPTYPE_EXTANACMP, \
+    .nChannel = chan, \
+    .wSampleRate = samprate, \
+    .xMinRawValue = 0, \
+    .xMaxRawValue = 0, \
+    .xMinEguValue = 0, \
+    .xMaxEguValue = 0, \
+    .eFiltType = SENMAN_FILTTYPE_NONE, \
+    .tGetFuncs.pvExt = getfunc, \
+    .pvExtCallback = NULL, \
+    .pvLinearize = NULL, \
+    .pvCompensate = cmpfunc, \
+  }
   
 /// define the helper macro for defining an external channel no filter
 #define SENMANEXTNOFILT( chan, samprate, minraw, maxraw, minegu, maxegu, getfunc ) \
@@ -293,6 +322,7 @@
     .eFiltType = SENMAN_FILTTYPE_NONE, \
     .tGetFuncs.pvExt = getfunc, \
     .pvLinearize = NULL, \
+    .pvCompensate = NULL, \
     .pvExtCallback = NULL, \
   }
   
@@ -309,6 +339,7 @@
     .eFiltType = SENMAN_FILTTYPE_NONE, \
     .tGetFuncs.pvExt = getfunc, \
     .pvLinearize = linfunc, \
+    .pvCompensate = NULL, \
     .pvExtCallback = NULL, \
     .nLinOption = linopt, \
   }
@@ -332,7 +363,8 @@
        }, \
       .tGetFuncs.pvExt = getfunc, \
       .pvLinearize = NULL, \
-    .pvExtCallback = NULL, \
+      .pvCompensate = NULL, \
+      .pvExtCallback = NULL, \
     }
 
   /// define the helper macro for defining a external channel with average filter and linearization
@@ -353,6 +385,7 @@
       }, \
       .tGetFuncs.pvExt = getfunc, \
       .pvLinearize = linfunc, \
+      .pvCompensate = NULL, \
       .pvExtCallback = NULL, \
       .nLinOption = linopt, \
     }
@@ -376,6 +409,7 @@
         .fLeadTc = leadtc, \
       } \
       .pvLinearize = NULL, \
+      .pvCompensate = NULL, \
       .pvExtCallback = NULL, \
     }
 
@@ -396,6 +430,7 @@
         .fLeadTc = leadtc, \
       }, \
       .pvLinearize = linfunc, \
+      .pvCompensate = NULL, \
       .pvExtCallback = NULL, \
   `   .nLinOption = linopt, \
     }
@@ -413,6 +448,7 @@
     .eFiltType = SENMAN_FILTTYPE_NONE, \
     .tGetFuncs.pvSpc = getfunc, \
     .pvLinearize = NULL, \
+    .pvCompensate = NULL, \
     .pvExtCallback = NULL, \
   }
   
@@ -428,7 +464,8 @@
    .eFiltType = SENMAN_FILTTYPE_NONE, \
    .tGetFuncs.pvSpc = getfunc, \
    .pvLinearize = linfunc, \
-    .pvExtCallback = NULL, \
+  .pvCompensate = NULL, \
+  .pvExtCallback = NULL, \
   .nLinOption = linopt, \
   }
   
@@ -450,6 +487,7 @@
       }, \
       .tGetFuncs.pvSpc = getfunc, \
       .pvLinearize = NULL, \
+      .pvCompensate = NULL, \
       .pvExtCallback = NULL, \
     }
   
@@ -470,6 +508,7 @@
       }, \
       .tGetFuncs.pvSpc = getfunc, \
       .pvLinearize = linfunc, \
+      .pvCompensate = NULL, \
       .pvExtCallback = NULL, \
       .nLinOption = linopt, \
     }
@@ -493,6 +532,7 @@
       }, \
       .tGetFuncs.pvSpc = getfunc, \
       .pvLinearize = NULL, \
+      .pvCompensate = NULL, \
     }
 
   /// define the helper macro for defining a special channel with lead lag filter and linearization
@@ -512,6 +552,7 @@
       }, \
       .tGetFuncs.pvSpc = getfunc, \
       .pvLinearize = linfunc, \
+      .pvCompensate = NULL, \
       .pvExtCallback = NULL, \
       .nLinOption = linopt, \
     }
@@ -524,6 +565,7 @@ typedef enum _SENMANINPTYPE
   SENMAN_INPTYPE_INTANA = 0,      ///< internal analog
   SENMAN_INPTYPE_EXTANA,          ///< external analog
   SENMAN_INPTYPE_EXTANACB,        ///< external analog, callback
+  SENMAN_INPTYPE_EXTANACMP,       ///< external analog, compensate
   SENMAN_INPTYPE_SPCANA,          ///< special analog
   SENMAN_INPTYPE_MAX
 } SENMANINPTYPE;
@@ -571,6 +613,7 @@ typedef S32         ( *PVSENMANGEREXT )( U8 nChannel );
 typedef S32         ( *PVSENMANGERSPC )( void );
 typedef S32         ( *PVSENMANGERLIN )( S32 lValue, U8 nOption );
 typedef BOOL        ( *PVSENMANGERECB )( U8 nChannel, PS32 plValue );
+typedef FLOAT       ( *PVSENMANGERCMP )( U8 nChannel, S32 lValue );
 
 /// define the sensor definition structure
 typedef struct _SENMANDEF
@@ -607,6 +650,7 @@ typedef struct _SENMANDEF
     PVSENMANGERSPC    pvSpc;          /// special get function
   } tGetFuncs;
   PVSENMANGERLIN      pvLinearize;    ///< pointer to the lineraize function
+  PVSENMANGERCMP      pvCompensate;   ///< pointer to the compensate function
   PVSENMANGERECB      pvExtCallback;  ///< pointer to callback function
   U8                  nLinOption;     ///< lineratization option
 } SENMANDEF, *PSENMANDEF;

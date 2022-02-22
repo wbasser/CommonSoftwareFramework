@@ -51,7 +51,7 @@ typedef enum _SENBME280MEASTYPE
 // global parameter declarations -----------------------------------------------
 
 // global function prototypes --------------------------------------------------
-extern  void    SenBME280_Initialize( void );
+extern  BOOL    SenBME280_Initialize( void );
 extern  void    SenBME280_ProcessScan( void );
 extern  S32     SenBME280_GetRawData( SENBME280MEASTYPE eMeasType );
 extern  FLOAT   SenBME280_Compensate( SENBME280MEASTYPE eMeasType, S32 lValue );

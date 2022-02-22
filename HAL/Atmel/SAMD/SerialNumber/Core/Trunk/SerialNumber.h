@@ -33,6 +33,8 @@
 #include "Types/Types.h"
 
 // Macros and Defines ---------------------------------------------------------
+/// define the GUID string length
+#define SERNUM_GUID_LENGTH                             ( 38 )
 
 // enumerations ---------------------------------------------------------------
 

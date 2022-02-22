@@ -203,6 +203,7 @@ static  S32         alRawValues[ SENBME280_MEASTYPE_MAX ];
 static  BOOL        bSensorOk;
 
 // local function prototypes --------------------------------------------------
+static  void    GetMeasurements( void );
 static  FLOAT   CompensateTemperature( S32 lRawTemp );
 static  FLOAT   CompensatePressure( S32 uRawPress );
 static  FLOAT   CompensateHumidity( S32 uRawHumid );
@@ -220,16 +221,20 @@ static  BOOL    SetSensorControl( CTLMEASMODE eMode );
  * This function will read the chip and verify correct chip, read the calibration
  * values and store them
  *
+ * @return  TRUE if errors detected, FALSE otherwise
+ *
  *****************************************************************************/
-void SenBME280_Initialize( void )
+BOOL SenBME280_Initialize( void )
 {
   U8        nChipId, nRetryCount;
   BOOL      bRetryEnable;
   
+  // set the status to OK
+  bSensorOk = FALSE;
+
   // enable the retry
   bRetryEnable = TRUE;
   nRetryCount = 5;
-  bSensorOk = FALSE;
   
   // retry loop
   do 
@@ -267,63 +272,31 @@ void SenBME280_Initialize( void )
       }
     }
   }
+  
+  // return the status
+  return( !bSensorOk );
 }
 
-/******************************************************************************
- * @function SenBME280_ProcessScan
- *
- * @brief process scan task
- *
- * This function will read the values from the device and perform any
- * necessary calibration
- *
- * @param[in]   xArg      task argument
- *
- * @return      TRUE flush event
- *
- *****************************************************************************/
-void SenBME280_ProcessScan( void )
-{
-  MEASUREMENTS  tMeasurements;
-  S32           lMeasValue;
-  
-  // set up for the read
-  if( !SenBME280_ReadRegisters( REG_MEAS_BASE, ( PU8 )&tMeasurements, MEASUREMENTS_SIZE ))
+#if ( SENBME280_ENABLE_SELF_SCAN == ON )
+  /******************************************************************************
+   * @function SenBME280_ProcessScan
+   *
+   * @brief process scan task
+   *
+   * This function will read the values from the device and perform any
+   * necessary calibration
+   *
+   * @param[in]   xArg      task argument
+   *
+   * @return      TRUE flush event
+   *
+   *****************************************************************************/
+  void SenBME280_ProcessScan( void )
   {
-    // perform compensation
-    lMeasValue = ( ((U32) tMeasurements.nTempMsb) << 12 );
-    lMeasValue |= ( ((U32) tMeasurements.nTempLsb) << 4 );
-    lMeasValue |= ( ((U32) tMeasurements.nTempXlsb) >> 4 );
-    alRawValues[ SENBME280_MEASTYPE_TEMP ] = lMeasValue;
-    #if ( SENBME280_COMPENSATE_AT_MEASURE == TRUE )
-      afActualValues[ SENBME280_MEASTYPE_TEMP ] = CompensateTemperature( alRawValues[ SENBME280_MEASTYPE_TEMP ] );
-    #endif // SENBME280_COMPENSATE_AT_MEASURE
-      
-    lMeasValue = ( ((U32) tMeasurements.nPressMsb) << 12 );
-    lMeasValue |= ( ((U32) tMeasurements.nPressLsb) << 4 );
-    lMeasValue |= ( ((U32) tMeasurements.nPressXlsb) >> 4 );
-    alRawValues[ SENBME280_MEASTYPE_PRES ] = lMeasValue;
-    #if ( SENBME280_COMPENSATE_AT_MEASURE == TRUE )
-      afActualValues[ SENBME280_MEASTYPE_PRES ] = CompensatePressure( alRawValues[ SENBME280_MEASTYPE_PRES ] );
-    #endif // SENBME280_COMPENSATE_AT_MEASURE
-      
-    lMeasValue = ( ((U32) tMeasurements.nHumidMsb) << 8 );
-    lMeasValue |= ( tMeasurements.nHumidLsb );
-    alRawValues[ SENBME280_MEASTYPE_HUMD ] = lMeasValue;
-    #if ( SENBME280_COMPENSATE_AT_MEASURE == TRUE )
-      afActualValues[ SENBME280_MEASTYPE_HUMD ] = CompensateHumidity( alRawValues[ SENBME280_MEASTYPE_HUMD ] );
-    #endif // SENBME280_COMPENSATE_AT_MEASURE
+    // get the measurements
+    GetMeasurements( );
   }
-  else
-  {
-    // set the error
-    bSensorOk = FALSE;
-    
-    // clear the values
-    memset( alRawValues, 0, sizeof( alRawValues ));
-    memset( afActualValues, 0, sizeof( afActualValues ));
-  }
-}
+#endif // SEMBME280_ENABLE_SELF_SCAN
 
 /******************************************************************************
  * @function SenBME280_GetRawData
@@ -344,6 +317,10 @@ S32 SenBME280_GetRawData( SENBME280MEASTYPE eMeasType )
   switch( eMeasType )
   {
     case SENBME280_MEASTYPE_TEMP :
+      #if( SENBME280_ENABLE_SELF_SCAN == OFF )
+        // perform a measurement
+        GetMeasurements( );
+      #endif
       lValue = alRawValues[ SENBME280_MEASTYPE_TEMP ];
       break;
       
@@ -425,6 +402,11 @@ BOOL SenBME280_GetMeasurement( SENBME280MEASTYPE eMeasType, PFLOAT pfValue )
     switch( eMeasType )
     {
       case SENBME280_MEASTYPE_TEMP :
+        #if( SENBME280_ENABLE_SELF_SCAN == OFF )
+          // perform a measurement
+          GetMeasurements( );
+        #endif
+        
         #if ( SENBME280_COMPENSATE_AT_MEASURE == FALSE )
           afActualValues[ SENBME280_MEASTYPE_TEMP ] = CompensateTemperature( alRawValues[ SENBME280_MEASTYPE_TEMP ] );
         #endif // SENBME280_COMPENSATE_AT_MEASURE
@@ -504,6 +486,57 @@ FLOAT SenBME280_GetPressure( void )
 {
   // return the pressure value
   return( afActualValues[ SENBME280_MEASTYPE_PRES ] );
+}
+
+/******************************************************************************
+ * @function GetMeasurements
+ *
+ * @brief get all measurements
+ *
+ * This function will read all measurements
+ *
+ *****************************************************************************/
+static void GetMeasurements( void )
+{
+    MEASUREMENTS  tMeasurements;
+    S32           lMeasValue;
+  
+    // set up for the read
+    if( !SenBME280_ReadRegisters( REG_MEAS_BASE, ( PU8 )&tMeasurements, MEASUREMENTS_SIZE ))
+    {
+      // perform compensation
+      lMeasValue = ( ((U32) tMeasurements.nTempMsb) << 12 );
+      lMeasValue |= ( ((U32) tMeasurements.nTempLsb) << 4 );
+      lMeasValue |= ( ((U32) tMeasurements.nTempXlsb) >> 4 );
+      alRawValues[ SENBME280_MEASTYPE_TEMP ] = lMeasValue;
+      #if ( SENBME280_COMPENSATE_AT_MEASURE == TRUE )
+        afActualValues[ SENBME280_MEASTYPE_TEMP ] = CompensateTemperature( alRawValues[ SENBME280_MEASTYPE_TEMP ] );
+      #endif // SENBME280_COMPENSATE_AT_MEASURE
+      
+      lMeasValue = ( ((U32) tMeasurements.nPressMsb) << 12 );
+      lMeasValue |= ( ((U32) tMeasurements.nPressLsb) << 4 );
+      lMeasValue |= ( ((U32) tMeasurements.nPressXlsb) >> 4 );
+      alRawValues[ SENBME280_MEASTYPE_PRES ] = lMeasValue;
+      #if ( SENBME280_COMPENSATE_AT_MEASURE == TRUE )
+        afActualValues[ SENBME280_MEASTYPE_PRES ] = CompensatePressure( alRawValues[ SENBME280_MEASTYPE_PRES ] );
+      #endif // SENBME280_COMPENSATE_AT_MEASURE
+      
+      lMeasValue = ( ((U32) tMeasurements.nHumidMsb) << 8 );
+      lMeasValue |= ( tMeasurements.nHumidLsb );
+      alRawValues[ SENBME280_MEASTYPE_HUMD ] = lMeasValue;
+      #if ( SENBME280_COMPENSATE_AT_MEASURE == TRUE )
+        afActualValues[ SENBME280_MEASTYPE_HUMD ] = CompensateHumidity( alRawValues[ SENBME280_MEASTYPE_HUMD ] );
+      #endif // SENBME280_COMPENSATE_AT_MEASURE
+    }
+    else
+    {
+      // set the error
+      bSensorOk = FALSE;
+    
+      // clear the values
+      memset( alRawValues, 0, sizeof( alRawValues ));
+      memset( afActualValues, 0, sizeof( afActualValues ));
+    }
 }
 
 /******************************************************************************

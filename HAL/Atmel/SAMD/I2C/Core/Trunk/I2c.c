@@ -63,7 +63,7 @@ typedef struct _LCLCTL
 {
   PI2CXFRCTL  ptXfrCtl;     ///< transfer control ointer
   U16         wBufIdx;      ///< buffer index
-  I2CERROR      eError;       ///< current error
+  I2CERROR    eError;       ///< current error
   BOOL        bRunning;     ///< running state
   BUSDIR      eBusDir;      ///< bus direction
 } LCLCTL, *PLCLCTL;

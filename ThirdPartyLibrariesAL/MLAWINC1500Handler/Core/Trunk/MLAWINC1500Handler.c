@@ -44,6 +44,7 @@
 /// define the control structure
 typedef struct _SOCKETCTL
 {
+  BOOL                    bAutoSocket;    ///< auto socket
   MLAWINC1500HANDSKTTYPE  eUdpTcp;        ///< UDP/TCP selector
   MLAWINC1500HANDCLTSVR   eCltSvr;        ///< client server
   PVSKTRCVCALLBACK        pvCallback;     ///< callback function
@@ -457,7 +458,7 @@ void MLAWINC1500Handler_SocketCallback( SOCKET cSock, t_m2mSocketEventType eEven
   tLclAddr.uAddress = 0;
 
   // check for automation
-  if ( ON == tWifiConfigActl.bAutoSocket )
+  if ( ON == ptCurCtl->bAutoSocket )
   {
     #if ( MLAWWINC1500HANDLER_ENABLE_DEBUG == ON )
       DebugManager_AddElement( 0x2100, eEventCode );
@@ -722,6 +723,7 @@ void MLAWINC1500Handler_ErrorCallback( U32 uErrorCode )
  *
  * This function will create and open a socket
  *
+ * @param[in]   bAutoSocke      enable auto socket 
  * @param[in]   tAddr           address of the server connection
  * @param[in]   wPort           port number
  * @param[in]   eUdpTcp         type of socket
@@ -732,7 +734,7 @@ void MLAWINC1500Handler_ErrorCallback( U32 uErrorCode )
  * @return      socket number of -1 if error
  *
  *****************************************************************************/
-SOCKET MLAWINC1500Handler_OpenSock( IPADDR tAddr, U16 wPort, MLAWINC1500HANDSKTTYPE eUdpTcp, MLAWINC1500HANDCLTSVR eClientSvr, PVSKTRCVCALLBACK pvCallback, PVSERVACPTCALLBACK pvGetRcvBuffer )
+SOCKET MLAWINC1500Handler_OpenSock( BOOL bAutoSocket, IPADDR tAddr, U16 wPort, MLAWINC1500HANDSKTTYPE eUdpTcp, MLAWINC1500HANDCLTSVR eClientSvr, PVSKTRCVCALLBACK pvCallback, PVSERVACPTCALLBACK pvGetRcvBuffer )
 {
   struct sockaddr_in    tAddress;
   SOCKET                cSocket;
@@ -754,6 +756,7 @@ SOCKET MLAWINC1500Handler_OpenSock( IPADDR tAddr, U16 wPort, MLAWINC1500HANDSKTT
     ptCurCtl->eUdpTcp = eUdpTcp;
     ptCurCtl->pvCallback = pvCallback;
     ptCurCtl->pvGetRcvBuffer = pvGetRcvBuffer;
+    ptCurCtl->bAutoSocket = bAutoSocket;
 
     #if ( MLAWWINC1500HANDLER_ENABLE_DEBUG == ON )
       DebugManager_AddElement( 0x2200, HI32( tAddr.uAddress ));
@@ -843,8 +846,10 @@ S32 MLAWINC1500Handler_RecvFrom( SOCKET cSock, PU8 pnData, U16 wLength )
  * @param[in]   pnRcvBuf    pointer to the receive buffer
  * @param[in]   wBufSize    size of the receive buffer
  *
+ * @return    appropriat error code
+ *
  *****************************************************************************/
-void MLAWINC1500Handler_Send( SOCKET cSock, PU8 pnData, U16 wLength )
+C8 MLAWINC1500Handler_Send( SOCKET cSock, PU8 pnData, U16 wLength )
 {
   U16 wTransmitCount;
   C8  cStatus;
@@ -868,6 +873,9 @@ void MLAWINC1500Handler_Send( SOCKET cSock, PU8 pnData, U16 wLength )
 
   // send the data
   cStatus = send( cSock, pnData, wTransmitCount, 0 );
+
+  // return the status 
+  return( cStatus );
 }
 
 /******************************************************************************
@@ -883,10 +891,13 @@ void MLAWINC1500Handler_Send( SOCKET cSock, PU8 pnData, U16 wLength )
  * @param[in]   tAddr       address of the server connection
  * @param[in]   wPort       port number
  *
+ * @return    appropriat error code
+ *
  *****************************************************************************/
-void MLAWINC1500Handler_SendTo( SOCKET cSock, PU8 pnData, U16 wLength, IPADDR tAddr, U16 wPort )
+C8 MLAWINC1500Handler_SendTo( SOCKET cSock, PU8 pnData, U16 wLength, IPADDR tAddr, U16 wPort )
 {
-  struct sockaddr_in    tAddress;
+  struct sockaddr_in  tAddress;
+  C8                  cStatus;
   
   // create the socket
   tAddress.sin_family = AF_INET;
@@ -894,7 +905,10 @@ void MLAWINC1500Handler_SendTo( SOCKET cSock, PU8 pnData, U16 wLength, IPADDR tA
   tAddress.sin_addr.s_addr = tAddr.uAddress;
 
   // send it
-  sendto( cSock, pnData, wLength, 0, ( struct sockaddr* )&tAddress, sizeof( struct sockaddr_in ));
+  cStatus = sendto( cSock, pnData, wLength, 0, ( struct sockaddr* )&tAddress, sizeof( struct sockaddr_in ));
+
+  // return the status 
+  return( cStatus );
 }
 
 /******************************************************************************

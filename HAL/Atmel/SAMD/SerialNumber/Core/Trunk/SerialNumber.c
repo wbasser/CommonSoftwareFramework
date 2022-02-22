@@ -35,9 +35,6 @@
 #define SERNUM_WORD_ADDR2                             ( 0x0080A044 )
 #define SERNUM_WORD_ADDR3                             ( 0x0080A048 )
 
-/// define the GUID string length
-#define SERNUM_GUID_LENGTH                             ( 35 )
-
 // enumerations ---------------------------------------------------------------
 
 // structures -----------------------------------------------------------------

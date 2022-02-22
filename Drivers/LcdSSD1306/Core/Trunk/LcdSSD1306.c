@@ -34,9 +34,9 @@
 /// determine the display type/set various options
 #if ( LCDSSD1306_TYPE_SELECT == LCDSSD1306_TYPE_128_64 )
   #define DISPLAY_END_PAGE                          ( 7 )
-  #define SSD1306_MULTIPLEX_VALUE                   ( 0x1F )
+  #define SSD1306_MULTIPLEX_VALUE                   ( 0x3F )
   #define SSD1306_COMPINS_VALUE                     ( 0x12 )
-  #define SSD1306_DEVICE_ADDRESS                    ( 0x3D )
+  #define SSD1306_DEVICE_ADDRESS                    ( 0x3C )
   #if ( LCDSSD1306_VCC_SELECT == LCDSSD1306_VCC_EXTRNAL )
     #define SSD1306_CONTRAST_VALUE                  ( 0x9F )
     #define SSD1306_VCC_VALUE                       ( 0x10 )
@@ -184,7 +184,7 @@ BOOL LcdSSD1306_Initialize( void )
   for ( nIdx = 0; nIdx < sizeof( anInitializationSequence ); nIdx++ )
   {
     // write the command 
-    LcdSSD1306_LocalWriteCommand( SSD1306_DEVICE_ADDRESS, anInitializationSequence[ nIdx ] );
+    bStatus |= LcdSSD1306_LocalWriteCommand( SSD1306_DEVICE_ADDRESS, anInitializationSequence[ nIdx ] );
   }
 
   // return status

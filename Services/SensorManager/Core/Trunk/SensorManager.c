@@ -212,12 +212,15 @@ void SensorManager_ProcessScan( void )
             break;
         
           case SENMAN_INPTYPE_EXTANA :
+          case SENMAN_INPTYPE_EXTANACMP :
             pvExtGet = PGM_RDWORD( ptDef->tGetFuncs.pvExt );
-            pvExtGet( PGM_RDBYTE( ptDef->nChannel ));
-            bScanWaitEnabled = TRUE;
+            lSenValue = pvExtGet( PGM_RDBYTE( ptDef->nChannel ));
             break;
 
           case SENMAN_INPTYPE_EXTANACB :
+            pvExtGet = PGM_RDWORD( ptDef->tGetFuncs.pvExt );
+            pvExtGet( PGM_RDBYTE( ptDef->nChannel ));
+            bScanWaitEnabled = TRUE;
             break;
         
           case SENMAN_INPTYPE_SPCANA :
@@ -316,15 +319,14 @@ SENMANERROR SensorManager_GetValue( SENMANENUM eSenEnum, PSENMANARG pxValue )
           break;
       }
       
-      // apply the scaling correction 
-      xMinRawValue = PGM_RDWORD( ptDef->xMinRawValue );
-      xMaxRawValue = PGM_RDWORD( ptDef->xMaxRawValue );
-      xMinEguValue = PGM_RDWORD( ptDef->xMinEguValue );
-      xMaxEguValue = PGM_RDWORD( ptDef->xMaxEguValue );
-      if ( xMaxRawValue != xMaxEguValue )
+      // scale only if parameters are not zero
+      if (( xMinRawValue != 0 ) && ( xMaxRawValue != 0 ) && ( xMinEguValue != 0 ) && ( xMaxEguValue != 0 ))
       {
-        // scale it
-        *( pxValue ) = MAP( ptCtl->xCurrentValue, xMinRawValue, xMaxRawValue, xMinEguValue, xMaxEguValue );
+        // apply the scaling correction 
+        xMinRawValue = PGM_RDWORD( ptDef->xMinRawValue );
+        xMaxRawValue = PGM_RDWORD( ptDef->xMaxRawValue );
+        xMinEguValue = PGM_RDWORD( ptDef->xMinEguValue );
+        xMaxEguValue = PGM_RDWORD( ptDef->xMaxEguValue );
       }
       else
       {
@@ -337,6 +339,11 @@ SENMANERROR SensorManager_GetValue( SENMANENUM eSenEnum, PSENMANARG pxValue )
       {
         // call the linerazation function
         *( pxValue ) = ptDef->pvLinearize( ptCtl->xCurrentValue, 0 );
+      }
+      else if ( ptDef->pvCompensate != NULL )
+      {
+        // call the compensation function
+        *( pxValue ) = ptDef->pvCompensate( ptDef->nChannel, ptCtl->xCurrentValue );
       }
     }
     else

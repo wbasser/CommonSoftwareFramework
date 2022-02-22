@@ -102,7 +102,7 @@ typedef void  ( *PVERRCALLBACK )( U32 uErrorCode );
 typedef struct _MLAWINC1500WIFICONFIG
 {
   BOOL    bAutoConnect;
-  BOOL    bAutoSocket;
+//  BOOL    bAutoSocket;
   U8      nConnectionMode;
   U8      nListenChannel;
   U8      nWepKeyIndex;
@@ -136,11 +136,11 @@ extern  void            MLAWINC1500Handler_IrqCallback( U8 nIrq, U8 nEvent, BOOL
 extern  void            MLAWINC1500Handler_WifiCallback( t_m2mWifiEventType eEventCode, t_wifiEventData* ptEventData );
 extern  void            MLAWINC1500Handler_SocketCallback( SOCKET cSock, t_m2mSocketEventType eEventCode, t_socketEventData* ptEventData );
 extern  void            MLAWINC1500Handler_ErrorCallback( U32 uErrorCode );
-extern  SOCKET          MLAWINC1500Handler_OpenSock( IPADDR tAddr, U16 wPort, MLAWINC1500HANDSKTTYPE eUdpTcp, MLAWINC1500HANDCLTSVR eClientSvr, PVSKTRCVCALLBACK pvCallback, PVSERVACPTCALLBACK pvGetRcvBuffer );
+extern  SOCKET          MLAWINC1500Handler_OpenSock( BOOL bAutoSocket, IPADDR tAddr, U16 wPort, MLAWINC1500HANDSKTTYPE eUdpTcp, MLAWINC1500HANDCLTSVR eClientSvr, PVSKTRCVCALLBACK pvCallback, PVSERVACPTCALLBACK pvGetRcvBuffer );
 extern  S32             MLAWINC1500Handler_Recv( SOCKET cSock, PU8 pnData, U16 wLength );
 extern  S32             MLAWINC1500Handler_RecvFrom( SOCKET cSock, PU8 pnData, U16 wLength );
-extern  void            MLAWINC1500Handler_Send( SOCKET cSock, PU8 pnData, U16 wLength );
-extern  void            MLAWINC1500Handler_SendTo( SOCKET cSock, PU8 pnData, U16 wLength, IPADDR tAddr, U16 wPort );
+extern  C8              MLAWINC1500Handler_Send( SOCKET cSock, PU8 pnData, U16 wLength );
+extern  C8              MLAWINC1500Handler_SendTo( SOCKET cSock, PU8 pnData, U16 wLength, IPADDR tAddr, U16 wPort );
 extern  void            MLAWINC1500Handler_CloseSocket( SOCKET cSock );
 extern  void            MLAWINC1500Handler_GetHostByName( PC8 pszHostName );
 
